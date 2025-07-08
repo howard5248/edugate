@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface Student {
@@ -10,17 +10,19 @@ interface Student {
 
 const StudentInfoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     const fetchStudent = async () => {
       try {
         const response = await axios.get(`/api/students/${id}`);
         setStudent(response.data);
-      } catch (err) {
-        setError('Failed to fetch student data');
+      } catch {
+        setError('找不到學生資料，請檢查學生證號碼是否正確');
       }
       setLoading(false);
     };
@@ -29,35 +31,99 @@ const StudentInfoPage: React.FC = () => {
   }, [id]);
 
   const handleConfirm = async () => {
+    if (!student) return;
+    
+    setIsConfirming(true);
     try {
       await axios.post('/api/records', { student_id: id });
-      alert('接送成功！');
-    } catch (err) {
-      alert('接送失敗');
+      alert('✅ 接送記錄已成功建立！');
+      navigate('/');
+    } catch {
+      alert('❌ 接送記錄建立失敗，請重試');
+    } finally {
+      setIsConfirming(false);
     }
   };
 
+  const handleBack = () => {
+    navigate('/');
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="student-info">
+        <div className="status-loading">
+          <div>⏳ 正在載入學生資料...</div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="student-info">
+        <div className="student-card">
+          <div className="status-error">
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+            <div>{error}</div>
+            <button 
+              className="btn-secondary mt-3"
+              onClick={handleBack}
+            >
+              返回首頁
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>學生資訊</h1>
-      {student ? (
-        <div>
-          <p><strong>學號：</strong> {student.id}</p>
-          <p><strong>姓名：</strong> {student.name}</p>
-          <p><strong>班級：</strong> {student.class_name}</p>
-          <button onClick={handleConfirm}>確認接送</button>
-        </div>
-      ) : (
-        <p>找不到學生資料</p>
-      )}
+    <div className="student-info">
+      <div className="student-card">
+        <h1>📋 學生資訊確認</h1>
+        
+        {student && (
+          <>
+            <div className="student-details">
+              <div className="detail-item">
+                <div className="detail-label">🆔 學號：</div>
+                <div className="detail-value">{student.id}</div>
+              </div>
+              <div className="detail-item">
+                <div className="detail-label">👤 姓名：</div>
+                <div className="detail-value">{student.name}</div>
+              </div>
+              <div className="detail-item">
+                <div className="detail-label">🏫 班級：</div>
+                <div className="detail-value">{student.class_name}</div>
+              </div>
+              <div className="detail-item">
+                <div className="detail-label">⏰ 接送時間：</div>
+                <div className="detail-value">{new Date().toLocaleString('zh-TW')}</div>
+              </div>
+            </div>
+            
+            <div className="flex gap-2" style={{ justifyContent: 'space-between' }}>
+              <button 
+                className="btn-secondary"
+                onClick={handleBack}
+                style={{ flex: 1 }}
+              >
+                ← 返回
+              </button>
+              <button 
+                className="confirm-button"
+                onClick={handleConfirm}
+                disabled={isConfirming}
+                style={{ flex: 2 }}
+              >
+                {isConfirming ? '⏳ 處理中...' : '✅ 確認接送'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
