@@ -1,0 +1,26 @@
+{
+  "name": "edugate",
+  "version": "1.0.0",
+  "description": "**EduGate** 是一個校園學生放學接送記錄系統，結合 Cloudflare Pages 與 Cloudflare Workers，提供即時、安全的學生離校記錄服務。學生家長可於校門口掃描學生條碼快速確認，系統將自動記錄時間並支援後台統計與資料匯出。",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:worker": "wrangler dev worker/src/index.ts --local",
+    "deploy": "npm run deploy:frontend && npm run deploy:worker",
+    "deploy:frontend": "npm run build --prefix frontend && wrangler pages deploy frontend/dist",
+    "deploy:worker": "wrangler deploy worker/src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250708.0",
+    "concurrently": "^9.2.0",
+    "wrangler": "^4.24.0"
+  },
+  "dependencies": {
+    "hono": "^4.8.4"
+  }
+}
