@@ -1,0 +1,13 @@
+name = "edugate-worker"
+main = "src/index.ts"
+compatibility_date = "2024-03-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "edugate-db"
+database_id = "03201b27-73fd-4b5b-9009-0c2853c78318"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["SchemaV1"]
+
