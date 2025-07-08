@@ -11,7 +11,5 @@ binding = "DB"
 database_name = "edugate-db"
 database_id = "03201b27-73fd-4b5b-9009-0c2853c78318"
 
-[[migrations]]
-tag = "v1"
-new_classes = ["SchemaV1"]
+# D1 数据库迁移将通过 migrations 文件夹中的 SQL 文件处理
 

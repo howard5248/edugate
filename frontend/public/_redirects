@@ -1,0 +1,6 @@
+# Cloudflare Pages 路由配置
+# 将API请求重定向到Worker
+/api/* https://edugate-worker.94219109.xyz/api/* 200
+
+# 将所有其他请求重定向到index.html（用于React Router）
+/* /index.html 200 
